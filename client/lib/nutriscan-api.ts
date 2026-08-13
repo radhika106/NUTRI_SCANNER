@@ -1,14 +1,18 @@
-export async function analyzeProduct(image: Blob): Promise<unknown> {
-  const formData = new FormData();
-  formData.append("image", image, "nutriscan-capture.jpg");
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-  const response = await fetch("/api/analyze-product", {
+export async function analyzeProduct(file: File) {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const response = await fetch(`${API_BASE}/api/scan`, {
     method: "POST",
     body: formData,
   });
 
   if (!response.ok) {
-    throw new Error("Unable to analyze this product.");
+    const errorData = await response.json();
+
+    throw new Error(errorData.message || "Unable to analyze this product.");
   }
 
   return response.json();
