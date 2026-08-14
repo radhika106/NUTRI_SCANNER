@@ -86,7 +86,7 @@ const extractStructuredData = async (ocrText) => {
   `;
 
   const response = await ai.models.generateContent({
-    model: "gemini-flash-latest",
+    model: "gemini-3.1-flash-lite",
     contents: prompt,
   });
 
@@ -98,7 +98,14 @@ const extractStructuredData = async (ocrText) => {
     .replace(/```/g, "")
     .trim();
 
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(cleaned);
+  } catch (error) {
+    console.error("Gemini returned invalid JSON:");
+    console.error(cleaned);
+
+    throw new Error("AI returned invalid JSON response");
+  }
 };
 
 export default extractStructuredData;
