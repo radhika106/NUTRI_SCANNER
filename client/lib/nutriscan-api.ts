@@ -9,13 +9,21 @@ export async function analyzeProduct(file: File) {
     body: formData,
   });
 
+  console.log("STATUS:", response.status);
+  console.log("CONTENT-TYPE:", response.headers.get("content-type"));
+
   const text = await response.text();
 
+  console.log("RAW RESPONSE START -----");
+  console.log(text);
+  console.log("RAW RESPONSE END -----");
+
   let data;
+
   try {
     data = JSON.parse(text);
   } catch {
-    console.error("Non-JSON response:", text);
+    console.error("invalid JSON response:", text);
     throw new Error(
       "Server returned an invalid response. Check backend route or server logs.",
     );

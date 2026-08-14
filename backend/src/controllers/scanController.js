@@ -50,14 +50,17 @@ const scanImage = async (req, res) => {
     //const ingredients = extractIngredientsOnly(structuredData);
 
     //image url
-    const imageUrl = `http://localhost:5000/uploads/${imageData.imageName}`;
+    //const imageUrl = `http://localhost:5000/uploads/${imageData.imageName}`;
+    const baseUrl =
+      process.env.BASE_URL || `${req.protocol}://${req.get("host")}`;
+    const imageUrl = `${baseUrl}/uploads/${imageData.imageName}`;
 
     // 7. Clean Response
     res.status(200).json({
       success: true,
 
       product: {
-        image: `http://localhost:5000/uploads/${imageData.imageName}`,
+        image: imageUrl,
         name: structuredData.product?.name || "Scanned Product",
         brand: structuredData.product?.brand || "NutriScan",
         category: structuredData.product?.category || "Food Product",
@@ -85,7 +88,9 @@ const scanImage = async (req, res) => {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message?.includes("503")
+        ? "AI service is temporarily busy. Please try again in a few seconds."
+        : error.message || "Something went wrong while analyzing the image.",
     });
   }
 };
