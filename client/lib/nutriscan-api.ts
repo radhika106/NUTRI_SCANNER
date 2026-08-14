@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL;
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/";
 
 export async function analyzeProduct(file: File) {
   const formData = new FormData();
@@ -9,11 +9,21 @@ export async function analyzeProduct(file: File) {
     body: formData,
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
+  const text = await response.text();
 
-    throw new Error(errorData.message || "Unable to analyze this product.");
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    console.error("Non-JSON response:", text);
+    throw new Error(
+      "Server returned an invalid response. Check backend route or server logs.",
+    );
   }
 
-  return response.json();
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || "Unable to analyze this product.");
+  }
+
+  return data;
 }
