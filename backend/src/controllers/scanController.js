@@ -60,7 +60,8 @@ const scanImage = async (req, res) => {
       success: true,
 
       product: {
-        image: imageUrl,
+        //image: "http://localhost:5000/uploads/${imageData.imageName}",
+        image: `${baseUrl}/uploads/${imageData.imageName}`,
         name: structuredData.product?.name || "Scanned Product",
         brand: structuredData.product?.brand || "NutriScan",
         category: structuredData.product?.category || "Food Product",

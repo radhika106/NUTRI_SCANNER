@@ -8,7 +8,8 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://nutri-scanner-seven.vercel.app",
+    // origin: "https://nutri-scanner-seven.vercel.app",
+    origin: "http://localhost:8080",
   }),
 );
 
