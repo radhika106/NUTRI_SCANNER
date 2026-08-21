@@ -6,10 +6,11 @@ import scanRoutes from "./routes/scanRoutes.js";
 
 const app = express();
 
+const allowedOrigins = ["http://localhost:8080", process.env.FRONTEND_URL];
+
 app.use(
   cors({
-    // origin: "https://nutri-scanner-seven.vercel.app",
-    origin: "http://localhost:8080",
+    origin: allowedOrigins,
   }),
 );
 
