@@ -78,7 +78,11 @@ const scanImage = async (req, res) => {
       watchOut: structuredData.watchOut || [],
       ingredients: structuredData.ingredients || [],
       nutrition: structuredData.nutrition || [],
-
+      healthImpacts: structuredData.healthImpacts || [],
+      healthTip: structuredData.healthTip || {
+        detail:
+          "Choose products based on their overall nutrition and ingredient profile.",
+      },
       recommendation: structuredData.recommendation || {
         title: "Try scanning again",
         detail:

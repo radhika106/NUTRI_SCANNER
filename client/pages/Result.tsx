@@ -34,11 +34,7 @@ type Ingredient = {
 
 type HealthImpactLevel = "low" | "moderate" | "high";
 type HealthImpactIcon =
-  | "bloodSugar"
-  | "bloodPressure"
-  | "weight"
-  | "heart"
-  | "dental";
+  "bloodSugar" | "bloodPressure" | "weight" | "heart" | "dental";
 
 type HealthImpact = {
   key: string;
@@ -370,7 +366,11 @@ function HealthImpactBar({ impact }: { impact: HealthImpactLevel }) {
   const segments = 7;
   const filled = impact === "high" ? 4 : impact === "moderate" ? 4 : 3;
   const color =
-    impact === "high" ? "#F04438" : impact === "moderate" ? "#F79009" : "#12B76A";
+    impact === "high"
+      ? "#F04438"
+      : impact === "moderate"
+        ? "#F79009"
+        : "#12B76A";
 
   return (
     <div className="flex gap-1">
@@ -405,12 +405,16 @@ function HealthImpactCard({ impact }: { impact: HealthImpact }) {
   return (
     <div className="health-impact-card">
       <div className="flex items-center gap-3">
-        <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconTone}`}>
+        <span
+          className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconTone}`}
+        >
           <Icon className="h-5 w-5" />
         </span>
         <div>
           <h3 className="text-sm font-bold">{impact.title}</h3>
-          <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold ${badgeTone}`}>
+          <span
+            className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold ${badgeTone}`}
+          >
             {IMPACT_LABELS[impact.impact]}
           </span>
         </div>
@@ -527,7 +531,10 @@ function ResultContent({ data }: { data: Analysis }) {
         <InsightPanel good={false} items={data.watchOut} />
       </div>
 
-      <HealthImpactSection impacts={data.healthImpacts} healthTip={data.healthTip} />
+      <HealthImpactSection
+        impacts={data.healthImpacts}
+        healthTip={data.healthTip}
+      />
 
       <section className="analysis-card mt-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -658,9 +665,12 @@ export default function Result() {
               <button
                 className="download-button"
                 onClick={() => {
-                  const file = new Blob([JSON.stringify(analysis, null, 2)], {
-                    type: "application/json",
-                  });
+                  const file = new Blob(
+                    [JSON.stringify(dynamicAnalysis, null, 2)],
+                    {
+                      type: "application/json",
+                    },
+                  );
                   const url = URL.createObjectURL(file);
                   const link = document.createElement("a");
                   link.href = url;
