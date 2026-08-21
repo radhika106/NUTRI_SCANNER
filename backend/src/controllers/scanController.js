@@ -52,7 +52,7 @@ const scanImage = async (req, res) => {
     //image url
     //const imageUrl = `http://localhost:5000/uploads/${imageData.imageName}`;
     const baseUrl =
-      process.env.BASE_URL || `${req.protocol}://${req.get("host")}`;
+      process.env.FRONTEND_URL || `${req.protocol}://${req.get("host")}`;
     const imageUrl = `${baseUrl}/uploads/${imageData.imageName}`;
 
     // 7. Clean Response
