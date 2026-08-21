@@ -2,17 +2,22 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
+  Activity,
   CalendarDays,
   Check,
   CheckCircle2,
   Download,
+  Droplet,
   FileText,
+  HeartPulse,
   Info,
   Leaf,
   Lightbulb,
   Moon,
   ScanLine,
+  Scale,
   ShieldAlert,
+  Smile,
   Sun,
   TriangleAlert,
   XCircle,
@@ -25,6 +30,23 @@ type Ingredient = {
   risk: IngredientRisk;
   description: string;
   assessment: string;
+};
+
+type HealthImpactLevel = "low" | "moderate" | "high";
+type HealthImpactIcon =
+  | "bloodSugar"
+  | "bloodPressure"
+  | "weight"
+  | "heart"
+  | "dental";
+
+type HealthImpact = {
+  key: string;
+  icon: HealthImpactIcon;
+  title: string;
+  impact: HealthImpactLevel;
+  description: string;
+  reasons: string[];
 };
 
 type Analysis = {
@@ -41,123 +63,10 @@ type Analysis = {
   watchOut: string[];
   ingredients: Ingredient[];
   nutrition: { label: string; value: string; warning?: boolean }[];
+  healthImpacts: HealthImpact[];
+  healthTip: { detail: string };
   recommendation: { title: string; detail: string };
 };
-
-// const analysis: Analysis = {
-//   product: {
-//     image:
-//       "https://cdn.builder.io/api/v1/image/assets%2Fd1f1a73a712c46ada14ee971643df117%2Fe7867c7552b84aff8107d262e4eb4382?format=webp&width=800&height=1200",
-//     name: "Crispy Oat Bites",
-//     brand: "Harvest & Co.",
-//     category: "Snack / Breakfast",
-//   },
-//   score: 45,
-//   rating: "Moderate Choice",
-//   explanation: "This product is okay for occasional consumption.",
-//   factors: [
-//     { label: "High Sugar", value: "High", tone: "high" },
-//     { label: "Saturated Fat", value: "Moderate", tone: "moderate" },
-//     { label: "Trans Fat", value: "Good", tone: "good" },
-//     { label: "Additives", value: "Moderate", tone: "moderate" },
-//   ],
-//   good: [
-//     "Contains oats which are a good source of fiber",
-//     "No trans fat detected",
-//     "Provides some essential minerals",
-//     "No artificial colors detected",
-//   ],
-//   watchOut: [
-//     "High in sugar",
-//     "Contains palm oil",
-//     "Contains artificial flavour",
-//     "Refined flour is used",
-//   ],
-//   ingredients: [
-//     {
-//       name: "Oats (35%)",
-//       risk: "safe",
-//       description:
-//         "A whole-grain ingredient that contributes fiber and texture.",
-//       assessment: "Low concern",
-//     },
-//     {
-//       name: "Wheat Flour (Maida)",
-//       risk: "moderate",
-//       description: "Refined flour used as the main structure for the snack.",
-//       assessment: "Moderate",
-//     },
-//     {
-//       name: "Sugar",
-//       risk: "high",
-//       description: "Adds sweetness and is listed high in the ingredient order.",
-//       assessment: "High concern",
-//     },
-//     {
-//       name: "Palm Oil",
-//       risk: "moderate",
-//       description:
-//         "Commonly used in packaged foods for texture and shelf life.",
-//       assessment: "Moderate",
-//     },
-//     {
-//       name: "Inverted Syrup",
-//       risk: "moderate",
-//       description:
-//         "A sweetening syrup that increases the total added sugar load.",
-//       assessment: "Moderate",
-//     },
-//     {
-//       name: "Cocoa Solids",
-//       risk: "safe",
-//       description: "Provides the product's cocoa flavor and color.",
-//       assessment: "Low concern",
-//     },
-//     {
-//       name: "Milk Solids",
-//       risk: "safe",
-//       description: "Adds dairy flavor and a small amount of protein.",
-//       assessment: "Low concern",
-//     },
-//     {
-//       name: "Emulsifier (INS 322)",
-//       risk: "safe",
-//       description: "Helps keep the ingredients blended and consistent.",
-//       assessment: "Low concern",
-//     },
-//     {
-//       name: "Raising Agent (INS 500(ii))",
-//       risk: "safe",
-//       description: "Helps the baked product achieve a lighter texture.",
-//       assessment: "Low concern",
-//     },
-//     {
-//       name: "Iodised Salt",
-//       risk: "moderate",
-//       description: "Adds flavor; sodium intake is best kept moderate.",
-//       assessment: "Moderate",
-//     },
-//     {
-//       name: "Artificial Flavour (Vanilla)",
-//       risk: "moderate",
-//       description: "Added flavoring used to create a consistent vanilla note.",
-//       assessment: "Moderate",
-//     },
-//   ],
-//   nutrition: [
-//     { label: "Energy", value: "452 kcal" },
-//     { label: "Carbohydrates", value: "68 g" },
-//     { label: "Sugar", value: "27 g", warning: true },
-//     { label: "Protein", value: "7 g" },
-//     { label: "Total Fat", value: "18 g" },
-//     { label: "Saturated Fat", value: "9 g", warning: true },
-//     { label: "Trans Fat", value: "0 g" },
-//   ],
-//   recommendation: {
-//     title: "Okay for occasional consumption.",
-//     detail: "Consider a lower-sugar, whole-grain alternative for daily use.",
-//   },
-// };
 
 const analysis: Analysis = {
   product: {
@@ -195,6 +104,54 @@ const analysis: Analysis = {
     { label: "Saturated Fat", value: "--" },
     { label: "Trans Fat", value: "--" },
   ],
+
+  healthImpacts: [
+    {
+      key: "bloodSugar",
+      icon: "bloodSugar",
+      title: "Blood Sugar",
+      impact: "low",
+      description: "Scan a product to see how it may affect blood sugar.",
+      reasons: [],
+    },
+    {
+      key: "bloodPressure",
+      icon: "bloodPressure",
+      title: "Blood Pressure",
+      impact: "low",
+      description: "Scan a product to see how it may affect blood pressure.",
+      reasons: [],
+    },
+    {
+      key: "weight",
+      icon: "weight",
+      title: "Weight Management",
+      impact: "low",
+      description: "Scan a product to see how it may affect weight goals.",
+      reasons: [],
+    },
+    {
+      key: "heart",
+      icon: "heart",
+      title: "Heart Health",
+      impact: "low",
+      description: "Scan a product to see how it may affect heart health.",
+      reasons: [],
+    },
+    {
+      key: "dental",
+      icon: "dental",
+      title: "Dental Health",
+      impact: "low",
+      description: "Scan a product to see how it may affect dental health.",
+      reasons: [],
+    },
+  ],
+
+  healthTip: {
+    detail:
+      "Scan your first product to get a personalized healthy-eating tip here.",
+  },
 
   recommendation: {
     title: "Start by scanning a product",
@@ -393,6 +350,130 @@ function IngredientExplorer({ ingredients }: { ingredients: Ingredient[] }) {
   );
 }
 
+// ---- Health Impact Section ----
+
+const HEALTH_IMPACT_ICONS: Record<HealthImpactIcon, typeof Droplet> = {
+  bloodSugar: Droplet,
+  bloodPressure: HeartPulse,
+  weight: Scale,
+  heart: Activity,
+  dental: Smile,
+};
+
+const IMPACT_LABELS: Record<HealthImpactLevel, string> = {
+  low: "Low Impact",
+  moderate: "Moderate Impact",
+  high: "High Impact",
+};
+
+function HealthImpactBar({ impact }: { impact: HealthImpactLevel }) {
+  const segments = 7;
+  const filled = impact === "high" ? 4 : impact === "moderate" ? 4 : 3;
+  const color =
+    impact === "high" ? "#F04438" : impact === "moderate" ? "#F79009" : "#12B76A";
+
+  return (
+    <div className="flex gap-1">
+      {Array.from({ length: segments }).map((_, index) => (
+        <span
+          key={index}
+          className="h-1.5 flex-1 rounded-full"
+          style={{
+            backgroundColor: index < filled ? color : "rgba(148,163,184,0.25)",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function HealthImpactCard({ impact }: { impact: HealthImpact }) {
+  const Icon = HEALTH_IMPACT_ICONS[impact.icon];
+  const iconTone =
+    impact.impact === "high"
+      ? "bg-[#3a1414] text-[#F04438]"
+      : impact.impact === "moderate"
+        ? "bg-[#3a2c10] text-[#F79009]"
+        : "bg-[#12301f] text-[#12B76A]";
+  const badgeTone =
+    impact.impact === "high"
+      ? "bg-[#3a1414] text-[#F97066]"
+      : impact.impact === "moderate"
+        ? "bg-[#3a2c10] text-[#FDB022]"
+        : "bg-[#12301f] text-[#32D583]";
+
+  return (
+    <div className="health-impact-card">
+      <div className="flex items-center gap-3">
+        <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconTone}`}>
+          <Icon className="h-5 w-5" />
+        </span>
+        <div>
+          <h3 className="text-sm font-bold">{impact.title}</h3>
+          <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold ${badgeTone}`}>
+            {IMPACT_LABELS[impact.impact]}
+          </span>
+        </div>
+      </div>
+      <div className="mt-4">
+        <HealthImpactBar impact={impact.impact} />
+      </div>
+      <p className="mt-3 text-sm leading-6 text-[#B4C9BF]">
+        {impact.description}
+      </p>
+      {impact.reasons.length > 0 && (
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+          <span className="rounded-full bg-[#12301f] px-2 py-1 font-bold text-[#65C51A]">
+            Why?
+          </span>
+          <span className="text-[#98A2B3]">{impact.reasons.join(", ")}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function HealthImpactSection({
+  impacts,
+  healthTip,
+}: {
+  impacts: HealthImpact[];
+  healthTip: { detail: string };
+}) {
+  return (
+    <section className="analysis-card mt-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <HeartPulse className="h-5 w-5 text-[#168A4A]" />
+            <h2>How This Product May Affect Your Health</h2>
+          </div>
+          <p className="mt-1 text-xs text-[#98A2B3]">
+            Based on ingredients and nutritional information
+          </p>
+        </div>
+        <button className="text-sm font-bold text-[#168A4A]">
+          View Detailed Analysis →
+        </button>
+      </div>
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {impacts.map((impact) => (
+          <HealthImpactCard key={impact.key} impact={impact} />
+        ))}
+        <div className="health-impact-card health-impact-tip">
+          <div className="flex items-center gap-2">
+            <Leaf className="h-5 w-5 text-[#65C51A]" />
+            <h3 className="text-sm font-bold">Healthy Tip</h3>
+          </div>
+          <p className="mt-3 text-sm leading-6 text-[#B4C9BF]">
+            {healthTip.detail}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ResultContent({ data }: { data: Analysis }) {
   const [scanTime, setScanTime] = useState("");
 
@@ -445,6 +526,9 @@ function ResultContent({ data }: { data: Analysis }) {
         <InsightPanel good items={data.good} />
         <InsightPanel good={false} items={data.watchOut} />
       </div>
+
+      <HealthImpactSection impacts={data.healthImpacts} healthTip={data.healthTip} />
+
       <section className="analysis-card mt-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -538,6 +622,8 @@ export default function Result() {
         watchOut: backendResult.watchOut || analysis.watchOut,
         ingredients: backendResult.ingredients || analysis.ingredients,
         nutrition: backendResult.nutrition || analysis.nutrition,
+        healthImpacts: backendResult.healthImpacts || analysis.healthImpacts,
+        healthTip: backendResult.healthTip || analysis.healthTip,
         recommendation: backendResult.recommendation || analysis.recommendation,
       }
     : analysis;
